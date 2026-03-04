@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { authStyles as s, cream, mauveBark } from './_styles';
+import { authStyles as s, cream, mauveBark, sharedStyles as ss } from './_styles';
 
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
@@ -56,7 +56,7 @@ export default function SignInScreen() {
           <View style={s.inputWrapper}>
             <Text style={s.label}>Email</Text>
             <TextInput
-              style={[s.input, errors.fields.identifier && s.inputError]}
+              style={[ss.fieldBorder, s.input, errors.fields.identifier && s.inputError]}
               placeholder="you@example.com"
               placeholderTextColor={`${mauveBark}60`}
               value={email}
@@ -73,7 +73,7 @@ export default function SignInScreen() {
           <View style={s.inputWrapper}>
             <Text style={s.label}>Password</Text>
             <TextInput
-              style={[s.input, errors.fields.password && s.inputError]}
+              style={[ss.fieldBorder, s.input, errors.fields.password && s.inputError]}
               placeholder="••••••••"
               placeholderTextColor={`${mauveBark}60`}
               value={password}
@@ -87,7 +87,7 @@ export default function SignInScreen() {
           </View>
 
           <Pressable
-            style={({ pressed }) => [s.button, pressed && s.buttonPressed]}
+            style={({ pressed }) => [ss.centeredButton, s.button, pressed && s.buttonPressed]}
             onPress={handleSignIn}
             disabled={loading}
           >
@@ -98,14 +98,14 @@ export default function SignInScreen() {
             )}
           </Pressable>
 
-          <View style={s.divider}>
+          <View style={[ss.row, s.divider]}>
             <View style={s.dividerLine} />
             <Text style={s.dividerText}>or</Text>
             <View style={s.dividerLine} />
           </View>
 
           <Link href="/(auth)/sign-up" asChild>
-            <Pressable style={s.secondaryButton}>
+            <Pressable style={[ss.centeredButton, s.secondaryButton]}>
               <Text style={s.secondaryButtonText}>Create an account</Text>
             </Pressable>
           </Link>

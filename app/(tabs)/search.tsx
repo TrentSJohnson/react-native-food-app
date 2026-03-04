@@ -12,7 +12,8 @@ import {
   View,
 } from 'react-native';
 
-import { Colors, burntPeach, cream, lightBlue, mauveBark, navajoWhite } from '@/constants/theme';
+import { sharedStyles as ss } from '@/constants/sharedStyles';
+import { Colors, burntPeach, cream, lightBlue, navajoWhite } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
@@ -90,12 +91,12 @@ async function fetchTextSearch(query: string, lat?: number, lng?: number): Promi
   return data.places ?? [];
 }
 
-function StarRating({ rating }: { rating: number }) {
+function StarRating({ rating, color }: { rating: number; color: string }) {
   const full = Math.floor(rating);
   const hasHalf = rating - full >= 0.5;
   const empty = 5 - full - (hasHalf ? 1 : 0);
   return (
-    <Text style={styles.stars}>
+    <Text style={[styles.stars, { color }]}>
       {'★'.repeat(full)}
       {hasHalf ? '½' : ''}
       {'☆'.repeat(empty)}
@@ -114,7 +115,7 @@ function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['l
 
   return (
     <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.secondary }]}>
-      <View style={styles.cardRow}>
+      <View style={ss.row}>
         {photoUri && (
           <Image source={{ uri: photoUri }} style={styles.cardPhoto} resizeMode="cover" />
         )}
@@ -127,8 +128,8 @@ function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['l
               {place.formattedAddress}
             </Text>
           )}
-          <View style={styles.cardMeta}>
-            {place.rating !== undefined && <StarRating rating={place.rating} />}
+          <View style={[ss.row, { gap: 8 }]}>
+            {place.rating !== undefined && <StarRating rating={place.rating} color={colors.text} />}
             {price && <Text style={[styles.metaChip, { color: colors.text }]}>{price}</Text>}
             {isOpen !== undefined && (
               <Text style={[styles.metaChip, { color: isOpen ? lightBlue : burntPeach }]}>
@@ -221,7 +222,7 @@ export default function SearchScreen() {
 
   const listHeader = (
     <View style={styles.listHeader}>
-      <Text style={[styles.listHeaderText, { color: colors.icon }]}>
+      <Text style={[styles.metaChip, { color: colors.icon }]}>
         {query.trim() ? `Results for "${query}"` : 'Restaurants near you'}
       </Text>
     </View>
@@ -230,7 +231,7 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Search bar */}
-      <View style={[styles.searchRow, { borderColor: navajoWhite }]}>
+      <View style={[ss.row, ss.fieldBorder, styles.searchRow, { borderColor: navajoWhite }]}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
           style={[styles.searchInput, { color: colors.text }]}
@@ -284,7 +285,7 @@ export default function SearchScreen() {
           ListHeaderComponent={places.length > 0 ? listHeader : null}
           ListEmptyComponent={
             <View style={styles.center}>
-              <Text style={[styles.emptyText, { color: colors.icon }]}>No restaurants found.</Text>
+              <Text style={[styles.errorText, { color: colors.icon }]}>No restaurants found.</Text>
             </View>
           }
           contentContainerStyle={styles.listContent}
@@ -299,14 +300,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginHorizontal: 16,
     marginTop: 16,
     marginBottom: 8,
     paddingHorizontal: 12,
-    borderWidth: 1.5,
-    borderRadius: 12,
     height: 48,
   },
   searchIcon: {
@@ -349,9 +346,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginHorizontal: 24,
   },
-  emptyText: {
-    fontSize: 15,
-  },
   listContent: {
     paddingBottom: 24,
   },
@@ -359,20 +353,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 4,
   },
-  listHeaderText: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
   card: {
     marginHorizontal: 16,
     marginBottom: 10,
     borderRadius: 12,
     borderWidth: 1,
     overflow: 'hidden',
-  },
-  cardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   cardPhoto: {
     width: 90,
@@ -391,14 +377,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 6,
   },
-  cardMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   stars: {
     fontSize: 13,
-    color: mauveBark,
   },
   metaChip: {
     fontSize: 13,

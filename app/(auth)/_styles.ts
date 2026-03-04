@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { burntPeach, cream, lightBlue, mauveBark, navajoWhite } from '@/constants/theme';
 
 export { burntPeach, cream, lightBlue, mauveBark, navajoWhite };
+export { sharedStyles } from '@/constants/sharedStyles';
 
 export const authStyles = StyleSheet.create({
   safeArea: {
@@ -60,9 +61,7 @@ export const authStyles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderWidth: 1.5,
     borderColor: navajoWhite,
-    borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
     color: mauveBark,
@@ -77,11 +76,7 @@ export const authStyles = StyleSheet.create({
     marginTop: 2,
   },
   button: {
-    height: 52,
     backgroundColor: burntPeach,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 4,
     shadowColor: burntPeach,
     shadowOffset: { width: 0, height: 4 },
@@ -100,8 +95,6 @@ export const authStyles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: 12,
   },
   dividerLine: {
@@ -115,12 +108,8 @@ export const authStyles = StyleSheet.create({
     fontWeight: '500',
   },
   secondaryButton: {
-    height: 52,
     borderWidth: 1.5,
     borderColor: lightBlue,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: `${lightBlue}20`,
   },
   secondaryButtonText: {
