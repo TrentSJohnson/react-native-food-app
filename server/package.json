@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "node index.mjs",
+    "dev": "node --env-file=.env --watch index.mjs"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0"
+  }
+}

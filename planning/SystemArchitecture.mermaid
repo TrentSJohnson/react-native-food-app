@@ -1,0 +1,30 @@
+graph TD
+    subgraph Vercel_Hosting [Hosted on Vercel]
+        UI[React Native / Expo Web]
+    end
+
+    subgraph Render_Hosting [Hosted on Render]
+        Server[Express.js API]
+    end
+
+    subgraph MongoDB_Atlas [Hosted on Mongo Atlas]
+        DB[(MongoDB Database)]
+    end
+
+    subgraph Clerk_Cloud [Managed by Clerk]
+        Auth[Clerk Auth Service]
+    end
+
+    UI <-->|1. Authenticate| Auth
+    UI ===>|2. Request with JWT| Server
+    Server -.->|3. Verify Token| Auth
+    Server <-->|4. Query/Write| DB
+
+    style Vercel_Hosting fill:#f9f9f9,stroke:#000,stroke-dasharray: 5 5
+    style Render_Hosting fill:#f0f4ff,stroke:#4663ff,stroke-dasharray: 5 5
+    style MongoDB_Atlas fill:#f0fff0,stroke:#00ed64,stroke-dasharray: 5 5
+    style Clerk_Cloud fill:#f5f0ff,stroke:#6c47ff,stroke-dasharray: 5 5
+    
+    style UI fill:#000,color:#fff
+    style Server fill:#4663ff,color:#fff
+    style DB fill:#00ed64,color:#000
