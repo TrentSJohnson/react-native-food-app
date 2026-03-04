@@ -1,16 +1,33 @@
-import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { useAuth, useUser } from '@clerk/expo';
+import { useRouter } from 'expo-router';
+import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
-export default function ModalScreen() {
+export default function AccountModal() {
+  const { signOut } = useAuth();
+  const { user } = useUser();
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace('/(auth)/sign-in');
+  };
+
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo style={styles.link}>
-        <ThemedText type="link">Go to home screen</ThemedText>
-      </Link>
+      <ThemedText type="title" style={styles.heading}>Account</ThemedText>
+      <ThemedText style={styles.email}>{user?.primaryEmailAddress?.emailAddress}</ThemedText>
+      <Pressable
+        onPress={handleSignOut}
+        style={[styles.signOutButton, { backgroundColor: colors.tint }]}>
+        <ThemedText style={styles.signOutText}>Sign Out</ThemedText>
+      </Pressable>
     </ThemedView>
   );
 }
@@ -20,10 +37,23 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 24,
+    gap: 16,
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+  heading: {
+    marginBottom: 8,
+  },
+  email: {
+    opacity: 0.7,
+    marginBottom: 24,
+  },
+  signOutButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  signOutText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
