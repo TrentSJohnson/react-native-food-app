@@ -38,11 +38,7 @@ export const authStyles = StyleSheet.create({
     borderRadius: 24,
     padding: 28,
     gap: 16,
-    shadowColor: mauveBark,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
+    boxShadow: '0px 4px 16px rgba(117, 79, 68, 0.08)',
   },
   cardTitle: {
     fontSize: 22,
@@ -78,11 +74,7 @@ export const authStyles = StyleSheet.create({
   button: {
     backgroundColor: burntPeach,
     marginTop: 4,
-    shadowColor: burntPeach,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    boxShadow: '0px 4px 8px rgba(236, 115, 87, 0.30)',
   },
   buttonPressed: {
     opacity: 0.85,

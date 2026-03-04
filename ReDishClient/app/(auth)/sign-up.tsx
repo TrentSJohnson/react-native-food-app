@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { authStyles as s, burntPeach, cream, mauveBark, sharedStyles as ss } from './_styles';
+import { authStyles as s, burntPeach, cream, mauveBark, sharedStyles as ss } from '@/constants/authStyles';
 
 export default function SignUpScreen() {
   const { signUp, errors, fetchStatus } = useSignUp();

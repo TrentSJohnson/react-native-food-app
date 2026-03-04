@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { authStyles as s, cream, mauveBark, sharedStyles as ss } from './_styles';
+import { authStyles as s, cream, mauveBark, sharedStyles as ss } from '@/constants/authStyles';
 
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
@@ -25,12 +25,12 @@ export default function SignInScreen() {
 
   const handleSignIn = async () => {
     const { error } = await signIn.password({ emailAddress: email, password });
-    if (error) return;
-
+    if (error) {
+      console.log('Sign in error:', error);
+      return;
+    }
     if (signIn.status === 'complete') {
-      await signIn.finalize({
-        navigate: () => router.replace('/(tabs)'),
-      });
+      await signIn.finalize();
     }
   };
 
