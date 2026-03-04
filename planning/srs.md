@@ -81,6 +81,13 @@ This is a standalone, greenfield product. It is the first entry into a planned s
 - **Acceptance Criteria:** User B must accept User A's request before User A can view User B's orders.
 - **Verification Method:** Demonstration.
 
+- **ID:** REQ-FUNC-004
+- **Title:** Friends' Recent Orders Feed
+- **Statement:** The system shall display a chronological feed of recent orders logged by confirmed friends.
+- **Rationale:** Core social value proposition — users can discover dishes through people they trust.
+- **Acceptance Criteria:** Feed shows the dish name, restaurant, rating, and timestamp for each friend's recent log; only accepted friends' orders are visible.
+- **Verification Method:** Demonstration.
+
 ### 2.3 Quality of Service
 
 #### 2.3.1 Performance
@@ -91,6 +98,10 @@ This is a standalone, greenfield product. It is the first entry into a planned s
 - **ID:** REQ-SEC-001
 - **Statement:** User order data shall not be visible to any user not confirmed as a "Friend" within the system.
 - **Rationale:** Privacy of user movement and dining habits.
+
+- **ID:** REQ-SEC-002
+- **Statement:** The authentication system shall comply with SOC 2 Type II security controls, including secure credential storage, encrypted data transmission (TLS 1.2+), session management with token expiration, and audit logging of authentication events.
+- **Rationale:** Establishes trust with users by ensuring their credentials and personal data are handled to an industry-recognized security standard.
 
 ---
 
@@ -112,7 +123,9 @@ This is a standalone, greenfield product. It is the first entry into a planned s
 |----------------|---------------------|--------------------|--------|----------|
 | REQ-FUNC-001   | Demonstration       | Search Flow Test   | Pending| N/A      |
 | REQ-FUNC-002   | Test                | CRUD Unit Tests    | Pending| N/A      |
+| REQ-FUNC-004   | Demonstration       | Friends Feed Test  | Pending| N/A      |
 | REQ-SEC-001    | Analysis            | Security Audit Doc | Pending| N/A      |
+| REQ-SEC-002    | Analysis            | SOC 2 Audit Doc    | Pending| N/A      |
 
 ---
 
