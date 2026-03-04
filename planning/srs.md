@@ -56,7 +56,7 @@ This is a standalone, greenfield product. It is the first entry into a planned s
 #### 2.1.3 Software Interfaces
 * **Database:** MongoDB Atlas (NoSQL) for user data and order logs.
 * **Maps API:** Google Places API for restaurant name and address verification.
-* **Auth Provider:** Firebase Authentication or Supabase for secure JWT management.
+* **Auth Provider:** Clerk for secure JWT management and SOC 2 compliant authentication.
 
 ### 2.2 Functional Requirements
 
