@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "node index.mjs"
+    "start": "node index.mjs",
+    "dev": "node --env-file=.env --watch index.mjs"
   },
   "dependencies": {
     "express": "^5.2.1",
