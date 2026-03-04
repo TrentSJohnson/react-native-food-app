@@ -1,11 +1,11 @@
 import { Platform } from 'react-native';
 
 // Your New Palette Constants
-const cream = '#fdffd6';
-const navajoWhite = '#fcd99c';
-const lightBlue = '#acd5d8';
-const burntPeach = '#ec7357';
-const mauveBark = '#754f44';
+export const cream = '#fdffd6';
+export const navajoWhite = '#fcd99c';
+export const lightBlue = '#acd5d8';
+export const burntPeach = '#ec7357';
+export const mauveBark = '#754f44';
 
 const tintColorLight = burntPeach; 
 const tintColorDark = cream;

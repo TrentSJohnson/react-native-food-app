@@ -7,18 +7,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const cream = '#fdffd6';
-const navajoWhite = '#fcd99c';
-const lightBlue = '#acd5d8';
-const burntPeach = '#ec7357';
-const mauveBark = '#754f44';
+import { authStyles as s, cream, mauveBark } from './_styles';
 
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
@@ -41,28 +35,28 @@ export default function SignInScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={s.safeArea}>
       <KeyboardAvoidingView
-        style={styles.container}
+        style={s.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.logoContainer}>
+        <View style={s.logoContainer}>
           <Image
             source={require('@/assets/images/logo.png')}
-            style={styles.logo}
+            style={s.logo}
             resizeMode="contain"
           />
-          <Text style={styles.appName}>ReDish</Text>
-          <Text style={styles.tagline}>Your favorite dishes, saved.</Text>
+          <Text style={s.appName}>ReDish</Text>
+          <Text style={s.tagline}>Your favorite dishes, saved.</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Welcome back</Text>
+        <View style={s.card}>
+          <Text style={s.cardTitle}>Welcome back</Text>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Email</Text>
+          <View style={s.inputWrapper}>
+            <Text style={s.label}>Email</Text>
             <TextInput
-              style={[styles.input, errors.fields.identifier && styles.inputError]}
+              style={[s.input, errors.fields.identifier && s.inputError]}
               placeholder="you@example.com"
               placeholderTextColor={`${mauveBark}60`}
               value={email}
@@ -72,14 +66,14 @@ export default function SignInScreen() {
               autoComplete="email"
             />
             {errors.fields.identifier && (
-              <Text style={styles.fieldError}>{errors.fields.identifier.message}</Text>
+              <Text style={s.fieldError}>{errors.fields.identifier.message}</Text>
             )}
           </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Password</Text>
+          <View style={s.inputWrapper}>
+            <Text style={s.label}>Password</Text>
             <TextInput
-              style={[styles.input, errors.fields.password && styles.inputError]}
+              style={[s.input, errors.fields.password && s.inputError]}
               placeholder="••••••••"
               placeholderTextColor={`${mauveBark}60`}
               value={password}
@@ -88,31 +82,31 @@ export default function SignInScreen() {
               autoComplete="password"
             />
             {errors.fields.password && (
-              <Text style={styles.fieldError}>{errors.fields.password.message}</Text>
+              <Text style={s.fieldError}>{errors.fields.password.message}</Text>
             )}
           </View>
 
           <Pressable
-            style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+            style={({ pressed }) => [s.button, pressed && s.buttonPressed]}
             onPress={handleSignIn}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color={cream} />
             ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
+              <Text style={s.buttonText}>Sign In</Text>
             )}
           </Pressable>
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
+          <View style={s.divider}>
+            <View style={s.dividerLine} />
+            <Text style={s.dividerText}>or</Text>
+            <View style={s.dividerLine} />
           </View>
 
           <Link href="/(auth)/sign-up" asChild>
-            <Pressable style={styles.secondaryButton}>
-              <Text style={styles.secondaryButtonText}>Create an account</Text>
+            <Pressable style={s.secondaryButton}>
+              <Text style={s.secondaryButtonText}>Create an account</Text>
             </Pressable>
           </Link>
         </View>
@@ -120,130 +114,3 @@ export default function SignInScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: cream,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    gap: 32,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  logo: {
-    width: 110,
-    height: 110,
-  },
-  appName: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: mauveBark,
-    letterSpacing: -0.5,
-  },
-  tagline: {
-    fontSize: 15,
-    color: `${mauveBark}99`,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 28,
-    gap: 16,
-    shadowColor: mauveBark,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
-  },
-  cardTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: mauveBark,
-    marginBottom: 4,
-  },
-  inputWrapper: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: mauveBark,
-    letterSpacing: 0.2,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1.5,
-    borderColor: navajoWhite,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: mauveBark,
-    backgroundColor: `${cream}80`,
-  },
-  inputError: {
-    borderColor: burntPeach,
-  },
-  fieldError: {
-    fontSize: 12,
-    color: burntPeach,
-    marginTop: 2,
-  },
-  button: {
-    height: 52,
-    backgroundColor: burntPeach,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-    shadowColor: burntPeach,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  buttonPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  buttonText: {
-    color: cream,
-    fontSize: 17,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: navajoWhite,
-  },
-  dividerText: {
-    fontSize: 13,
-    color: `${mauveBark}80`,
-    fontWeight: '500',
-  },
-  secondaryButton: {
-    height: 52,
-    borderWidth: 1.5,
-    borderColor: lightBlue,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: `${lightBlue}20`,
-  },
-  secondaryButtonText: {
-    color: mauveBark,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
