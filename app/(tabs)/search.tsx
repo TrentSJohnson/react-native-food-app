@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -16,7 +17,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 const PLACES_BASE = 'https://places.googleapis.com/v1/places';
-const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.currentOpeningHours,places.businessStatus';
+const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.currentOpeningHours,places.businessStatus,places.photos';
 
 type Place = {
   id: string;
@@ -26,6 +27,7 @@ type Place = {
   priceLevel?: string;
   currentOpeningHours?: { openNow?: boolean };
   businessStatus?: string;
+  photos?: { name: string }[];
 };
 
 const PRICE_LABELS: Record<string, string> = {
@@ -105,25 +107,36 @@ function StarRating({ rating }: { rating: number }) {
 function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['light'] }) {
   const isOpen = place.currentOpeningHours?.openNow;
   const price = place.priceLevel ? PRICE_LABELS[place.priceLevel] : null;
+  const photoName = place.photos?.[0]?.name;
+  const photoUri = photoName
+    ? `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=400&key=${API_KEY}`
+    : null;
 
   return (
     <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.secondary }]}>
-      <Text style={[styles.cardName, { color: colors.text }]} numberOfLines={1}>
-        {place.displayName.text}
-      </Text>
-      {place.formattedAddress && (
-        <Text style={[styles.cardAddress, { color: colors.icon }]} numberOfLines={2}>
-          {place.formattedAddress}
-        </Text>
-      )}
-      <View style={styles.cardMeta}>
-        {place.rating !== undefined && <StarRating rating={place.rating} />}
-        {price && <Text style={[styles.metaChip, { color: colors.text }]}>{price}</Text>}
-        {isOpen !== undefined && (
-          <Text style={[styles.metaChip, { color: isOpen ? lightBlue : burntPeach }]}>
-            {isOpen ? 'Open' : 'Closed'}
-          </Text>
+      <View style={styles.cardRow}>
+        {photoUri && (
+          <Image source={{ uri: photoUri }} style={styles.cardPhoto} resizeMode="cover" />
         )}
+        <View style={styles.cardBody}>
+          <Text style={[styles.cardName, { color: colors.text }]} numberOfLines={1}>
+            {place.displayName.text}
+          </Text>
+          {place.formattedAddress && (
+            <Text style={[styles.cardAddress, { color: colors.icon }]} numberOfLines={2}>
+              {place.formattedAddress}
+            </Text>
+          )}
+          <View style={styles.cardMeta}>
+            {place.rating !== undefined && <StarRating rating={place.rating} />}
+            {price && <Text style={[styles.metaChip, { color: colors.text }]}>{price}</Text>}
+            {isOpen !== undefined && (
+              <Text style={[styles.metaChip, { color: isOpen ? lightBlue : burntPeach }]}>
+                {isOpen ? 'Open' : 'Closed'}
+              </Text>
+            )}
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -353,9 +366,21 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginBottom: 10,
-    padding: 14,
     borderRadius: 12,
     borderWidth: 1,
+    overflow: 'hidden',
+  },
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardPhoto: {
+    width: 90,
+    height: 90,
+  },
+  cardBody: {
+    flex: 1,
+    padding: 12,
   },
   cardName: {
     fontSize: 16,
