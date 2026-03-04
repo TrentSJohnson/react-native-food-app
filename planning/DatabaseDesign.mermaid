@@ -1,0 +1,29 @@
+erDiagram
+    USER {
+        string userId PK
+        string email
+        string name
+    }
+
+    LOCATION {
+        string locationId PK
+        json googleData
+    }
+
+    FAVORITES {
+        string favoriteId PK
+        string userId FK
+        string locationId FK
+        string name
+        datetime timestamp
+    }
+
+    SUBSCRIBER {
+        string publisherId FK
+        string subscriberId FK
+    }
+
+    USER ||--o{ FAVORITES : "creates"
+    LOCATION ||--o{ FAVORITES : "is saved in"
+    USER ||--o{ SUBSCRIBER : "acts as publisher"
+    USER ||--o{ SUBSCRIBER : "acts as subscriber"
