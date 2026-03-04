@@ -72,7 +72,7 @@ export default function SignUpScreen() {
             <View style={s.inputWrapper}>
               <Text style={s.label}>Verification Code</Text>
               <TextInput
-                style={[ss.fieldBorder, s.input, styles.codeInput, errors.fields.code && s.inputError]}
+                style={{...ss.fieldBorder, ...s.input, ...styles.codeInput, ...(errors.fields.code ? s.inputError : undefined)}}
                 placeholder="000000"
                 placeholderTextColor={`${mauveBark}60`}
                 value={code}
@@ -110,7 +110,7 @@ export default function SignUpScreen() {
     <SafeAreaView style={s.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <View style={[s.logoContainer, { marginBottom: 8 }]}>
+          <View style={{...s.logoContainer, marginBottom: 8}}>
             <Image
               source={require('@/assets/images/logo.png')}
               style={s.logo}
@@ -126,7 +126,7 @@ export default function SignUpScreen() {
             <View style={s.inputWrapper}>
               <Text style={s.label}>Email</Text>
               <TextInput
-                style={[ss.fieldBorder, s.input, errors.fields.emailAddress && s.inputError]}
+                style={{...ss.fieldBorder, ...s.input, ...(errors.fields.emailAddress ? s.inputError : undefined)}}
                 placeholder="you@example.com"
                 placeholderTextColor={`${mauveBark}60`}
                 value={email}
@@ -143,7 +143,7 @@ export default function SignUpScreen() {
             <View style={s.inputWrapper}>
               <Text style={s.label}>Password</Text>
               <TextInput
-                style={[ss.fieldBorder, s.input, errors.fields.password && s.inputError]}
+                style={{...ss.fieldBorder, ...s.input, ...(errors.fields.password ? s.inputError : undefined)}}
                 placeholder="Min. 8 characters"
                 placeholderTextColor={`${mauveBark}60`}
                 value={password}
@@ -171,14 +171,14 @@ export default function SignUpScreen() {
               )}
             </Pressable>
 
-            <View style={[ss.row, s.divider]}>
+            <View style={{...ss.row, ...s.divider}}>
               <View style={s.dividerLine} />
               <Text style={s.dividerText}>or</Text>
               <View style={s.dividerLine} />
             </View>
 
             <Link href="/(auth)/sign-in" asChild>
-              <Pressable style={[ss.centeredButton, s.secondaryButton]}>
+              <Pressable style={{...ss.centeredButton, ...s.secondaryButton}}>
                 <Text style={s.secondaryButtonText}>Sign in instead</Text>
               </Pressable>
             </Link>

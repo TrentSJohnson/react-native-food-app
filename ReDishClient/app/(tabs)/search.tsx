@@ -96,7 +96,7 @@ function StarRating({ rating, color }: { rating: number; color: string }) {
   const hasHalf = rating - full >= 0.5;
   const empty = 5 - full - (hasHalf ? 1 : 0);
   return (
-    <Text style={[styles.stars, { color }]}>
+    <Text style={{...styles.stars, color}}>
       {'★'.repeat(full)}
       {hasHalf ? '½' : ''}
       {'☆'.repeat(empty)}
@@ -114,25 +114,25 @@ function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['l
     : null;
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.secondary }]}>
+    <View style={{...styles.card, backgroundColor: colors.background, borderColor: colors.secondary}}>
       <View style={ss.row}>
         {photoUri && (
           <Image source={{ uri: photoUri }} style={styles.cardPhoto} resizeMode="cover" />
         )}
         <View style={styles.cardBody}>
-          <Text style={[styles.cardName, { color: colors.text }]} numberOfLines={1}>
+          <Text style={{...styles.cardName, color: colors.text}} numberOfLines={1}>
             {place.displayName.text}
           </Text>
           {place.formattedAddress && (
-            <Text style={[styles.cardAddress, { color: colors.icon }]} numberOfLines={2}>
+            <Text style={{...styles.cardAddress, color: colors.icon}} numberOfLines={2}>
               {place.formattedAddress}
             </Text>
           )}
-          <View style={[ss.row, { gap: 8 }]}>
+          <View style={{...ss.row, gap: 8}}>
             {place.rating !== undefined && <StarRating rating={place.rating} color={colors.text} />}
-            {price && <Text style={[styles.metaChip, { color: colors.text }]}>{price}</Text>}
+            {price && <Text style={{...styles.metaChip, color: colors.text}}>{price}</Text>}
             {isOpen !== undefined && (
-              <Text style={[styles.metaChip, { color: isOpen ? lightBlue : burntPeach }]}>
+              <Text style={{...styles.metaChip, color: isOpen ? lightBlue : burntPeach}}>
                 {isOpen ? 'Open' : 'Closed'}
               </Text>
             )}
@@ -222,19 +222,19 @@ export default function SearchScreen() {
 
   const listHeader = (
     <View style={styles.listHeader}>
-      <Text style={[styles.metaChip, { color: colors.icon }]}>
+      <Text style={{...styles.metaChip, color: colors.icon}}>
         {query.trim() ? `Results for "${query}"` : 'Restaurants near you'}
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={{...styles.container, backgroundColor: colors.background}}>
       {/* Search bar */}
-      <View style={[ss.row, ss.fieldBorder, styles.searchRow, { borderColor: navajoWhite }]}>
+      <View style={{...ss.row, ...ss.fieldBorder, ...styles.searchRow, borderColor: navajoWhite}}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
-          style={[styles.searchInput, { color: colors.text }]}
+          style={{...styles.searchInput, color: colors.text}}
           placeholder="Search restaurants..."
           placeholderTextColor={colors.icon}
           value={query}
@@ -244,7 +244,7 @@ export default function SearchScreen() {
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => handleQueryChange('')}>
-            <Text style={[styles.clearBtn, { color: colors.icon }]}>✕</Text>
+            <Text style={{...styles.clearBtn, color: colors.icon}}>✕</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -252,14 +252,14 @@ export default function SearchScreen() {
       {/* Near me button */}
       {!locationDenied && (
         <TouchableOpacity
-          style={[styles.nearMeBtn, { backgroundColor: burntPeach }]}
+          style={{...styles.nearMeBtn, backgroundColor: burntPeach}}
           onPress={handleRefreshNearby}>
-          <Text style={[styles.nearMeBtnText, { color: cream }]}>📍 Near me</Text>
+          <Text style={{...styles.nearMeBtnText, color: cream}}>📍 Near me</Text>
         </TouchableOpacity>
       )}
 
       {locationDenied && (
-        <Text style={[styles.notice, { color: colors.icon }]}>
+        <Text style={{...styles.notice, color: colors.icon}}>
           Enable location permissions to find nearby restaurants.
         </Text>
       )}
@@ -273,7 +273,7 @@ export default function SearchScreen() {
 
       {!loading && error && (
         <View style={styles.center}>
-          <Text style={[styles.errorText, { color: burntPeach }]}>{error}</Text>
+          <Text style={{...styles.errorText, color: burntPeach}}>{error}</Text>
         </View>
       )}
 
@@ -285,7 +285,7 @@ export default function SearchScreen() {
           ListHeaderComponent={places.length > 0 ? listHeader : null}
           ListEmptyComponent={
             <View style={styles.center}>
-              <Text style={[styles.errorText, { color: colors.icon }]}>No restaurants found.</Text>
+              <Text style={{...styles.errorText, color: colors.icon}}>No restaurants found.</Text>
             </View>
           }
           contentContainerStyle={styles.listContent}

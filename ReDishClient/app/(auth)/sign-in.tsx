@@ -56,7 +56,7 @@ export default function SignInScreen() {
           <View style={s.inputWrapper}>
             <Text style={s.label}>Email</Text>
             <TextInput
-              style={[ss.fieldBorder, s.input, errors.fields.identifier && s.inputError]}
+              style={{...ss.fieldBorder, ...s.input, ...(errors.fields.identifier ? s.inputError : undefined)}}
               placeholder="you@example.com"
               placeholderTextColor={`${mauveBark}60`}
               value={email}
@@ -73,7 +73,7 @@ export default function SignInScreen() {
           <View style={s.inputWrapper}>
             <Text style={s.label}>Password</Text>
             <TextInput
-              style={[ss.fieldBorder, s.input, errors.fields.password && s.inputError]}
+              style={{...ss.fieldBorder, ...s.input, ...(errors.fields.password ? s.inputError : undefined)}}
               placeholder="••••••••"
               placeholderTextColor={`${mauveBark}60`}
               value={password}
@@ -98,14 +98,14 @@ export default function SignInScreen() {
             )}
           </Pressable>
 
-          <View style={[ss.row, s.divider]}>
+          <View style={{...ss.row, ...s.divider}}>
             <View style={s.dividerLine} />
             <Text style={s.dividerText}>or</Text>
             <View style={s.dividerLine} />
           </View>
 
           <Link href="/(auth)/sign-up" asChild>
-            <Pressable style={[ss.centeredButton, s.secondaryButton]}>
+            <Pressable style={{...ss.centeredButton, ...s.secondaryButton}}>
               <Text style={s.secondaryButtonText}>Create an account</Text>
             </Pressable>
           </Link>
