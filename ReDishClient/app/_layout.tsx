@@ -34,7 +34,8 @@ function RootLayoutNav() {
     upsertedRef.current = true;
 
     const email = user.primaryEmailAddress?.emailAddress ?? '';
-    api.upsertUser(email).catch((err) => console.error('User upsert failed:', err));
+    const username = user.username ?? undefined;
+    api.upsertUser(email, username).catch((err) => console.error('User upsert failed:', err));
   }, [isSignedIn, user]);
 
   useEffect(() => {

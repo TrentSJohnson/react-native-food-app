@@ -22,6 +22,7 @@ export default function AccountModal() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.heading}>Account</ThemedText>
+      {user?.username && <ThemedText style={styles.username}>@{user.username}</ThemedText>}
       <ThemedText style={styles.email}>{user?.primaryEmailAddress?.emailAddress}</ThemedText>
       <Pressable
         onPress={handleSignOut}
@@ -42,6 +43,10 @@ const styles = StyleSheet.create({
   },
   heading: {
     marginBottom: 8,
+  },
+  username: {
+    opacity: 0.9,
+    fontWeight: '600',
   },
   email: {
     opacity: 0.7,

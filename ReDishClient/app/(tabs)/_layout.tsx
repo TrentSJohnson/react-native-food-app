@@ -81,6 +81,9 @@ export default function TabLayout() {
           <ThemedText style={styles.email}>
             {user?.primaryEmailAddress?.emailAddress}
           </ThemedText>
+          <ThemedText style={styles.email}>
+            {`@${user?.username}`}
+          </ThemedText>
           <Pressable
             onPress={handleSignOut}
             style={[styles.signOutButton, { backgroundColor: colors.tint }]}>
