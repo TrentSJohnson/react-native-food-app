@@ -6,7 +6,6 @@ import {
   FlatList,
   Image,
   Modal,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -275,7 +274,7 @@ export default function SearchScreen() {
   );
 
   return (
-    <SafeAreaView style={{...styles.container, backgroundColor: colors.background}}>
+    <View style={{...styles.container, backgroundColor: colors.background}}>
       <Modal
         visible={orderModalPlace !== null}
         animationType="slide"
@@ -376,7 +375,7 @@ export default function SearchScreen() {
           contentContainerStyle={styles.listContent}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
