@@ -308,7 +308,7 @@ export default function SearchScreen() {
                 disabled={savingOrder || !orderDescription.trim()}>
                 {savingOrder
                   ? <ActivityIndicator size="small" color={cream} />
-                  : <Text style={{color: cream, fontWeight: '600'}}>Save Order</Text>
+                  : <Text style={{color: cream, fontWeight: '600'}}>Save Favorite Order</Text>
                 }
               </TouchableOpacity>
             </View>
