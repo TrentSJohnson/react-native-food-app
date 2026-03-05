@@ -2,9 +2,9 @@ import { ClerkLoaded, ClerkProvider, useAuth, useUser } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect, useRef } from 'react';
+import { ping, upsertUser } from '../services/api';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
 if (!publishableKey) {
   throw new Error('Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env file');
@@ -18,6 +18,12 @@ function RootLayoutNav() {
   const upsertedRef = useRef(false);
 
   useEffect(() => {
+    ping()
+      .then((data) => console.log('Server ping:', data))
+      .catch((err) => console.error('Server ping failed:', err));
+  }, []);
+
+  useEffect(() => {
     if (!isSignedIn || !user) {
       upsertedRef.current = false;
       return;
@@ -26,11 +32,7 @@ function RootLayoutNav() {
     upsertedRef.current = true;
 
     const email = user.primaryEmailAddress?.emailAddress ?? '';
-    fetch(`${API_URL}/users/upsert`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clerkId: user.id, email }),
-    }).catch((err) => console.error('User upsert failed:', err));
+    upsertUser(user.id, email).catch((err) => console.error('User upsert failed:', err));
   }, [isSignedIn, user]);
 
   useEffect(() => {
