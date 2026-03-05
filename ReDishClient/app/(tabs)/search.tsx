@@ -2,9 +2,10 @@ import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
-  SafeAreaView,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -15,6 +16,7 @@ import {
 import { sharedStyles as ss } from '@/constants/sharedStyles';
 import { Colors, burntPeach, cream, lightBlue, navajoWhite } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useApi } from '@/hooks/useApi';
 
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 const PLACES_BASE = 'https://places.googleapis.com/v1/places';
@@ -105,7 +107,15 @@ function StarRating({ rating, color }: { rating: number; color: string }) {
   );
 }
 
-function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['light'] }) {
+function PlaceCard({
+  place,
+  colors,
+  onAddOrder,
+}: {
+  place: Place;
+  colors: (typeof Colors)['light'];
+  onAddOrder: (place: Place) => void;
+}) {
   const isOpen = place.currentOpeningHours?.openNow;
   const price = place.priceLevel ? PRICE_LABELS[place.priceLevel] : null;
   const photoName = place.photos?.[0]?.name;
@@ -137,6 +147,11 @@ function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['l
               </Text>
             )}
           </View>
+          <TouchableOpacity
+            style={{...styles.addOrderBtn, backgroundColor: burntPeach}}
+            onPress={() => onAddOrder(place)}>
+            <Text style={{...styles.addOrderBtnText, color: cream}}>+ Add Order</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -146,6 +161,7 @@ function PlaceCard({ place, colors }: { place: Place; colors: (typeof Colors)['l
 export default function SearchScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const api = useApi();
 
   const [query, setQuery] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
@@ -153,6 +169,10 @@ export default function SearchScreen() {
   const [error, setError] = useState<string | null>(null);
   const [locationCoords, setLocationCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
+
+  const [orderModalPlace, setOrderModalPlace] = useState<Place | null>(null);
+  const [orderDescription, setOrderDescription] = useState('');
+  const [savingOrder, setSavingOrder] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -220,6 +240,31 @@ export default function SearchScreen() {
     }
   };
 
+  const handleAddOrder = (place: Place) => {
+    setOrderModalPlace(place);
+    setOrderDescription('');
+  };
+
+  const handleSaveOrder = async () => {
+    if (!orderModalPlace || !orderDescription.trim()) return;
+    setSavingOrder(true);
+    try {
+      await api.saveOrder(orderDescription.trim(), {
+        googlePlaceId: orderModalPlace.id,
+        name: orderModalPlace.displayName.text,
+        address: orderModalPlace.formattedAddress,
+        rating: orderModalPlace.rating,
+        priceLevel: orderModalPlace.priceLevel,
+      });
+      setOrderModalPlace(null);
+      Alert.alert('Saved!', 'Your order has been saved.');
+    } catch (e: unknown) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Failed to save order');
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
   const listHeader = (
     <View style={styles.listHeader}>
       <Text style={{...styles.metaChip, color: colors.icon}}>
@@ -229,7 +274,46 @@ export default function SearchScreen() {
   );
 
   return (
-    <SafeAreaView style={{...styles.container, backgroundColor: colors.background}}>
+    <View style={{...styles.container, backgroundColor: colors.background}}>
+      <Modal
+        visible={orderModalPlace !== null}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setOrderModalPlace(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={{...styles.modalCard, backgroundColor: colors.background}}>
+            <Text style={{...styles.modalTitle, color: colors.text}} numberOfLines={1}>
+              {orderModalPlace?.displayName.text}
+            </Text>
+            <Text style={{...styles.modalLabel, color: colors.icon}}>Describe your order</Text>
+            <TextInput
+              style={{...styles.modalInput, color: colors.text, borderColor: navajoWhite}}
+              placeholder="e.g. Spicy chicken sandwich, no pickles..."
+              placeholderTextColor={colors.icon}
+              value={orderDescription}
+              onChangeText={setOrderDescription}
+              multiline
+              autoFocus
+            />
+            <View style={{...ss.row, gap: 12, marginTop: 12}}>
+              <TouchableOpacity
+                style={{...styles.modalBtn, borderColor: navajoWhite, borderWidth: 1}}
+                onPress={() => setOrderModalPlace(null)}>
+                <Text style={{color: colors.text}}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{...styles.modalBtn, backgroundColor: burntPeach, opacity: savingOrder ? 0.6 : 1}}
+                onPress={handleSaveOrder}
+                disabled={savingOrder || !orderDescription.trim()}>
+                {savingOrder
+                  ? <ActivityIndicator size="small" color={cream} />
+                  : <Text style={{color: cream, fontWeight: '600'}}>Save Favorite Order</Text>
+                }
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       {/* Search bar */}
       <View style={{...ss.row, ...ss.fieldBorder, ...styles.searchRow, borderColor: navajoWhite}}>
         <Text style={styles.searchIcon}>🔍</Text>
@@ -281,7 +365,7 @@ export default function SearchScreen() {
         <FlatList
           data={places}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PlaceCard place={item} colors={colors} />}
+          renderItem={({ item }) => <PlaceCard place={item} colors={colors} onAddOrder={handleAddOrder} />}
           ListHeaderComponent={places.length > 0 ? listHeader : null}
           ListEmptyComponent={
             <View style={styles.center}>
@@ -291,7 +375,7 @@ export default function SearchScreen() {
           contentContainerStyle={styles.listContent}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -383,5 +467,50 @@ const styles = StyleSheet.create({
   metaChip: {
     fontSize: 13,
     fontWeight: '500',
+  },
+  addOrderBtn: {
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+  },
+  addOrderBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  modalCard: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  modalLabel: {
+    fontSize: 13,
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 15,
+    minHeight: 90,
+    textAlignVertical: 'top',
+  },
+  modalBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 });
