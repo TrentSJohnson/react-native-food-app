@@ -1,5 +1,10 @@
 import { User } from '../models/user.mjs';
 
+export async function getUsers(_req, res) {
+  const users = await User.find({});
+  res.json({ users });
+}
+
 export async function upsertUser(req, res) {
   const { clerkId, email } = req.body;
   if (!clerkId || !email) {
