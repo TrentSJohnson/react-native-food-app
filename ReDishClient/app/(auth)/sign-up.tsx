@@ -15,14 +15,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authStyles as s, burntPeach, cream, mauveBark, sharedStyles as ss } from '@/constants/authStyles';
+import { useApi } from '@/hooks/useApi';
 
 export default function SignUpScreen() {
   const { signUp, errors, fetchStatus } = useSignUp();
   const router = useRouter();
+  const api = useApi();
 
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [usernameChecking, setUsernameChecking] = useState(false);
 
   const loading = fetchStatus === 'fetching';
 
@@ -31,7 +36,48 @@ export default function SignUpScreen() {
     signUp.unverifiedFields.includes('email_address') &&
     signUp.missingFields.length === 0;
 
+  const validateUsername = (value: string) => {
+    if (value.length < 3) return 'Must be at least 3 characters';
+    if (!/^[a-z0-9_]+$/.test(value.toLowerCase())) return 'Only letters, numbers, and underscores';
+    return '';
+  };
+
+  const handleUsernameBlur = async () => {
+    const trimmed = username.trim().toLowerCase();
+    const localError = validateUsername(trimmed);
+    if (localError) {
+      setUsernameError(localError);
+      return;
+    }
+    setUsernameChecking(true);
+    try {
+      const { available } = await api.checkUsername(trimmed);
+      setUsernameError(available ? '' : 'Username is already taken');
+    } catch {
+      // silently fail — server will validate on upsert
+    } finally {
+      setUsernameChecking(false);
+    }
+  };
+
   const handleSignUp = async () => {
+    const trimmed = username.trim().toLowerCase();
+    const localError = validateUsername(trimmed);
+    if (localError) {
+      setUsernameError(localError);
+      return;
+    }
+
+    try {
+      const { available } = await api.checkUsername(trimmed);
+      if (!available) {
+        setUsernameError('Username is already taken');
+        return;
+      }
+    } catch {
+      // proceed and let server handle it
+    }
+
     const { error } = await signUp.password({ emailAddress: email, password });
     if (error) return;
     await signUp.verifications.sendEmailCode();
@@ -42,7 +88,14 @@ export default function SignUpScreen() {
 
     if (signUp.status === 'complete') {
       await signUp.finalize({
-        navigate: () => router.replace('/(tabs)'),
+        navigate: async () => {
+          try {
+            await api.upsertUser(email, username.trim().toLowerCase());
+          } catch (err) {
+            console.error('upsertUser failed:', err);
+          }
+          router.replace('/(tabs)');
+        },
       });
     }
   };
@@ -141,6 +194,27 @@ export default function SignUpScreen() {
             </View>
 
             <View style={s.inputWrapper}>
+              <Text style={s.label}>Username</Text>
+              <TextInput
+                style={{...ss.fieldBorder, ...s.input, ...(usernameError ? s.inputError : undefined)}}
+                placeholder="letters, numbers, underscores"
+                placeholderTextColor={`${mauveBark}60`}
+                value={username}
+                onChangeText={(v) => {
+                  setUsername(v);
+                  setUsernameError('');
+                }}
+                onBlur={handleUsernameBlur}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {usernameChecking && <Text style={styles.checkingText}>Checking availability...</Text>}
+              {!usernameChecking && usernameError && (
+                <Text style={s.fieldError}>{usernameError}</Text>
+              )}
+            </View>
+
+            <View style={s.inputWrapper}>
               <Text style={s.label}>Password</Text>
               <TextInput
                 style={{...ss.fieldBorder, ...s.input, ...(errors.fields.password ? s.inputError : undefined)}}
@@ -162,7 +236,7 @@ export default function SignUpScreen() {
             <Pressable
               style={({ pressed }) => [ss.centeredButton, s.button, pressed && s.buttonPressed]}
               onPress={handleSignUp}
-              disabled={loading}
+              disabled={loading || usernameChecking}
             >
               {loading ? (
                 <ActivityIndicator color={cream} />
@@ -220,5 +294,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: burntPeach,
     fontWeight: '600',
+  },
+  checkingText: {
+    fontSize: 12,
+    color: `${mauveBark}80`,
+    marginTop: 2,
   },
 });
