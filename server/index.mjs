@@ -1,30 +1,26 @@
+import cors from 'cors';
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
+import pingRoutes from './routes/ping.mjs';
+import userRoutes from './routes/users.mjs';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-app.get('/ping', (req, res) => {
-  res.json({ message: 'pong' });
-});
+app.use(cors());
+app.use(express.json());
 
-app.get('/ping/db', async (req, res) => {
-  if (!MONGODB_URI) {
-    return res.status(500).json({ status: 'error', message: 'MONGODB_URI not set' });
-  }
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI not set');
+  process.exit(1);
+}
 
-  const client = new MongoClient(MONGODB_URI);
-  try {
-    await client.connect();
-    await client.db('admin').command({ ping: 1 });
-    res.json({ status: 'ok', message: 'MongoDB Atlas is reachable' });
-  } catch (err) {
-    res.status(503).json({ status: 'error', message: err.message });
-  } finally {
-    await client.close();
-  }
-});
+await mongoose.connect(MONGODB_URI);
+console.log('Connected to MongoDB');
+
+app.use('/ping', pingRoutes);
+app.use('/users', userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
