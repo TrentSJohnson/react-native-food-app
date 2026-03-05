@@ -34,7 +34,6 @@ export const authStyles = StyleSheet.create({
     color: `${mauveBark}99`,
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 24,
     padding: 28,
     gap: 16,
