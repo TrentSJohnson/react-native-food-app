@@ -1,6 +1,7 @@
 import { Location } from '../models/location.mjs';
 
 export async function upsertLocation(req, res) {
+  console.log('[upsertLocation] POST /locations/upsert');
   const { googlePlaceId, name, address, rating, priceLevel } = req.body;
 
   if (!googlePlaceId || !name) {
