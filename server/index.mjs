@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
+import { clerkInit } from './middleware/requireAuth.mjs';
 import pingRoutes from './routes/ping.mjs';
 import userRoutes from './routes/users.mjs';
 
@@ -10,6 +11,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 app.use(cors());
 app.use(express.json());
+app.use(clerkInit);
 
 if (!MONGODB_URI) {
   console.error('MONGODB_URI not set');

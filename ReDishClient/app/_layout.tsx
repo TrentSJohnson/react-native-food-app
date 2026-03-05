@@ -2,7 +2,7 @@ import { ClerkLoaded, ClerkProvider, useAuth, useUser } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { ping, upsertUser } from '../services/api';
+import { useApi, useAuthInterceptor } from '../hooks/useApi';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -16,9 +16,11 @@ function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
   const upsertedRef = useRef(false);
+  useAuthInterceptor();
+  const api = useApi();
 
   useEffect(() => {
-    ping()
+    api.ping()
       .then((data) => console.log('Server ping:', data))
       .catch((err) => console.error('Server ping failed:', err));
   }, []);
@@ -32,7 +34,7 @@ function RootLayoutNav() {
     upsertedRef.current = true;
 
     const email = user.primaryEmailAddress?.emailAddress ?? '';
-    upsertUser(user.id, email).catch((err) => console.error('User upsert failed:', err));
+    api.upsertUser(email).catch((err) => console.error('User upsert failed:', err));
   }, [isSignedIn, user]);
 
   useEffect(() => {

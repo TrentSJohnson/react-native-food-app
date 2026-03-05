@@ -4,6 +4,7 @@
     "dev": "node --env-file=.env --watch index.mjs"
   },
   "dependencies": {
+    "@clerk/express": "^2.0.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongodb": "^7.1.0",
