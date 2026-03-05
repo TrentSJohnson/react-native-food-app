@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authStyles as s, cream, mauveBark, sharedStyles as ss } from '@/constants/authStyles';
+import { SignIn } from '@clerk/expo/web';
 
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
@@ -53,62 +54,7 @@ export default function SignInScreen() {
         <View style={s.card}>
           <Text style={s.cardTitle}>Welcome back</Text>
 
-          <View style={s.inputWrapper}>
-            <Text style={s.label}>Email</Text>
-            <TextInput
-              style={{...ss.fieldBorder, ...s.input, ...(errors.fields.identifier ? s.inputError : undefined)}}
-              placeholder="you@example.com"
-              placeholderTextColor={`${mauveBark}60`}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-            />
-            {errors.fields.identifier && (
-              <Text style={s.fieldError}>{errors.fields.identifier.message}</Text>
-            )}
-          </View>
-
-          <View style={s.inputWrapper}>
-            <Text style={s.label}>Password</Text>
-            <TextInput
-              style={{...ss.fieldBorder, ...s.input, ...(errors.fields.password ? s.inputError : undefined)}}
-              placeholder="••••••••"
-              placeholderTextColor={`${mauveBark}60`}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-            />
-            {errors.fields.password && (
-              <Text style={s.fieldError}>{errors.fields.password.message}</Text>
-            )}
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [ss.centeredButton, s.button, pressed && s.buttonPressed]}
-            onPress={handleSignIn}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={cream} />
-            ) : (
-              <Text style={s.buttonText}>Sign In</Text>
-            )}
-          </Pressable>
-
-          <View style={{...ss.row, ...s.divider}}>
-            <View style={s.dividerLine} />
-            <Text style={s.dividerText}>or</Text>
-            <View style={s.dividerLine} />
-          </View>
-
-          <Link href="/(auth)/sign-up" asChild>
-            <Pressable style={{...ss.centeredButton, ...s.secondaryButton}}>
-              <Text style={s.secondaryButtonText}>Create an account</Text>
-            </Pressable>
-          </Link>
+          <SignIn/>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
