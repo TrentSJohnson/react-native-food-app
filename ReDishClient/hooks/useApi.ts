@@ -18,9 +18,27 @@ export function useAuthInterceptor() {
   }, [getToken]);
 }
 
+type PlaceData = {
+  googlePlaceId: string;
+  name: string;
+  address?: string;
+  rating?: number;
+  priceLevel?: string;
+};
+
 export function useApi() {
   return {
     ping: () => api.get<{ message: string }>('/ping').then((r) => r.data),
     upsertUser: (email: string) => api.post('/users/upsert', { email }).then((r) => r.data),
+    upsertLocation: (place: PlaceData) =>
+      api.post<{ location: { _id: string } }>('/locations/upsert', place).then((r) => r.data),
+    createOrder: (description: string, locationId: string) =>
+      api.post('/orders', { description, locationId }).then((r) => r.data),
+    saveOrder: async (description: string, place: PlaceData) => {
+      const { location } = await api
+        .post<{ location: { _id: string } }>('/locations/upsert', place)
+        .then((r) => r.data);
+      return api.post('/orders', { description, locationId: location._id }).then((r) => r.data);
+    },
   };
 }
