@@ -15,7 +15,7 @@ export async function upsertUser(req, res) {
   const user = await User.findOneAndUpdate(
     { clerkId },
     { clerkId, email },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   res.json({ user });
