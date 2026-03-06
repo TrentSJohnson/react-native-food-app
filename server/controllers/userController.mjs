@@ -35,16 +35,6 @@ export async function getMe(req, res) {
   res.json({ user });
 }
 
-export async function checkUsername(req, res) {
-  console.log('[checkUsername] GET /users/check-username/:username');
-  const { username } = req.params;
-  if (!username || username.length < 3) {
-    return res.status(400).json({ error: 'Username must be at least 3 characters' });
-  }
-  const existing = await User.findOne({ username: username.toLowerCase() });
-  res.json({ available: !existing });
-}
-
 export async function searchUsers(req, res) {
   console.log('[searchUsers] GET /users/search');
   const { userId: clerkId } = getAuth(req);

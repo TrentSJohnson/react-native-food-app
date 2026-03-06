@@ -48,8 +48,6 @@ export function useApi() {
     upsertUser: (email: string, username?: string) =>
       api.post('/users/upsert', { email, username }).then((r) => r.data),
     getMe: () => api.get<{ user: User }>('/users/me').then((r) => r.data),
-    checkUsername: (username: string) =>
-      api.get<{ available: boolean }>(`/users/check-username/${encodeURIComponent(username)}`).then((r) => r.data),
     upsertLocation: (place: PlaceData) =>
       api.post<{ location: { _id: string } }>('/locations/upsert', place).then((r) => r.data),
     createOrder: (description: string, locationId: string) =>
