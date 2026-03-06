@@ -1,9 +1,6 @@
 graph TD
-    subgraph Vercel_Hosting [Hosted on Vercel]
-        UI[React Native / Expo Web]
-    end
-
     subgraph Render_Hosting [Hosted on Render]
+        UI[React Native / Expo Web]
         Server[Express.js API]
     end
 
@@ -20,7 +17,6 @@ graph TD
     Server -.->|3. Verify Token| Auth
     Server <-->|4. Query/Write| DB
 
-    style Vercel_Hosting fill:#f9f9f9,stroke:#000,stroke-dasharray: 5 5
     style Render_Hosting fill:#f0f4ff,stroke:#4663ff,stroke-dasharray: 5 5
     style MongoDB_Atlas fill:#f0fff0,stroke:#00ed64,stroke-dasharray: 5 5
     style Clerk_Cloud fill:#f5f0ff,stroke:#6c47ff,stroke-dasharray: 5 5
