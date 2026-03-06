@@ -1,29 +1,36 @@
 erDiagram
     USER {
-        string userId PK
+        string clerkId PK
         string email
-        string name
+        string username
+        datetime createdAt
     }
 
     LOCATION {
-        string locationId PK
-        json googleData
+        string googlePlaceId PK
+        string name
+        string address
+        number rating
+        string priceLevel
+        datetime createdAt
     }
 
-    FAVORITES {
-        string favoriteId PK
+    ORDER {
+        string orderId PK
         string userId FK
         string locationId FK
-        string name
-        datetime timestamp
+        string description
+        datetime createdAt
     }
 
     SUBSCRIBER {
         string publisherId FK
         string subscriberId FK
+        string status
+        datetime createdAt
     }
 
-    USER ||--o{ FAVORITES : "creates"
-    LOCATION ||--o{ FAVORITES : "is saved in"
+    USER ||--o{ ORDER : "creates"
+    LOCATION ||--o{ ORDER : "is ordered at"
     USER ||--o{ SUBSCRIBER : "acts as publisher"
     USER ||--o{ SUBSCRIBER : "acts as subscriber"
