@@ -3,7 +3,9 @@
 A React Native mobile app to document and share your favorite restaurant orders with friends. See breakdown [here](https://youtu.be/aSkrtj5Egi8)
 
 Demo Login Info: 
+
 Email: demo_test+clerk@demo.com 
+
 Password: redishdemo
 
 ---
