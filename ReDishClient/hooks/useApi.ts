@@ -1,21 +1,9 @@
 import { useAuth } from '@clerk/expo';
-import { useEffect } from 'react';
-import { api } from '../services/api';
+import { api, setAuthState } from '../services/api';
 
 export function useAuthInterceptor() {
-  const { getToken } = useAuth();
-
-  useEffect(() => {
-    const id = api.interceptors.request.use(async (config) => {
-      const token = await getToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    });
-
-    return () => api.interceptors.request.eject(id);
-  }, [getToken]);
+  const { getToken, userId } = useAuth();
+  setAuthState(getToken, userId ?? null);
 }
 
 type PlaceData = {
@@ -26,11 +14,19 @@ type PlaceData = {
   priceLevel?: string;
 };
 
-type User = {
+export type User = {
   _id: string;
   clerkId: string;
   email: string;
   username?: string;
+  createdAt: string;
+};
+
+export type FriendRequest = {
+  _id: string;
+  publisherId: User | string;
+  subscriberId: User | string;
+  status: 'pending' | 'accepted' | 'rejected';
   createdAt: string;
 };
 
@@ -40,10 +36,6 @@ export function useApi() {
     upsertUser: (email: string, username?: string) =>
       api.post('/users/upsert', { email, username }).then((r) => r.data),
     getMe: () => api.get<{ user: User }>('/users/me').then((r) => r.data),
-    checkUsername: (username: string) =>
-      api.get<{ available: boolean }>(`/users/check-username/${encodeURIComponent(username)}`).then((r) => r.data),
-    updateUsername: (username: string) =>
-      api.patch<{ user: User }>('/users/username', { username }).then((r) => r.data),
     upsertLocation: (place: PlaceData) =>
       api.post<{ location: { _id: string } }>('/locations/upsert', place).then((r) => r.data),
     createOrder: (description: string, locationId: string) =>
@@ -54,5 +46,19 @@ export function useApi() {
         .then((r) => r.data);
       return api.post('/orders', { description, locationId: location._id }).then((r) => r.data);
     },
+    searchUsers: (q: string) =>
+      api.get<{ users: User[] }>(`/users/search?q=${encodeURIComponent(q)}`).then((r) => r.data),
+    sendFriendRequest: (targetUserId: string) =>
+      api.post<{ request: FriendRequest }>(`/subscribers/request/${targetUserId}`).then((r) => r.data),
+    getReceivedRequests: () =>
+      api.get<{ requests: FriendRequest[] }>('/subscribers/requests/received').then((r) => r.data),
+    getSentRequests: () =>
+      api.get<{ requests: FriendRequest[] }>('/subscribers/requests/sent').then((r) => r.data),
+    acceptFriendRequest: (requestId: string) =>
+      api.patch<{ request: FriendRequest }>(`/subscribers/requests/${requestId}/accept`).then((r) => r.data),
+    deleteFriendRequest: (requestId: string) =>
+      api.delete<{ success: boolean }>(`/subscribers/requests/${requestId}`).then((r) => r.data),
+    getFriends: () =>
+      api.get<{ friends: User[] }>('/subscribers/friends').then((r) => r.data),
   };
 }

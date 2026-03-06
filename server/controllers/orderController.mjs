@@ -1,10 +1,9 @@
-import { getAuth } from '@clerk/express';
 import { Order } from '../models/order.mjs';
 
 export async function createOrder(req, res) {
   console.log('[createOrder] POST /orders');
   const { description, locationId } = req.body;
-  const { userId } = getAuth(req);
+  const userId = req.query.clerkId;
 
   if (!description || !locationId) {
     return res.status(400).json({ error: 'description and locationId are required' });
@@ -16,7 +15,7 @@ export async function createOrder(req, res) {
 
 export async function getOrders(req, res) {
   console.log('[getOrders] GET /orders');
-  const { userId } = getAuth(req);
+  const userId = req.query.clerkId;
   const orders = await Order.find({ userId }).populate('locationId').sort({ createdAt: -1 });
   res.json({ orders });
 }
