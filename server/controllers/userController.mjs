@@ -31,7 +31,7 @@ export async function getMe(req, res) {
   console.log('[getMe] GET /users/me');
   const { userId: clerkId } = getAuth(req);
   const user = await User.findOne({ clerkId });
-  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (!user) return res.status(404).json({ error: `User not found ${clerkId}` });
   res.json({ user });
 }
 
@@ -43,6 +43,18 @@ export async function checkUsername(req, res) {
   }
   const existing = await User.findOne({ username: username.toLowerCase() });
   res.json({ available: !existing });
+}
+
+export async function searchUsers(req, res) {
+  console.log('[searchUsers] GET /users/search');
+  const { userId: clerkId } = getAuth(req);
+  const { q } = req.query;
+  if (!q || q.length < 2) {
+    return res.status(400).json({ error: 'Query must be at least 2 characters' });
+  }
+  const users = await User.find(
+    { username: { $regex: q.toLowerCase(), $options: 'i' } }).limit(20);
+  res.json({ users });
 }
 
 export async function updateUsername(req, res) {

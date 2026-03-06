@@ -5,6 +5,7 @@ import { clerkInit } from './middleware/requireAuth.mjs';
 import locationRoutes from './routes/locations.mjs';
 import orderRoutes from './routes/orders.mjs';
 import pingRoutes from './routes/ping.mjs';
+import subscriberRoutes from './routes/subscribers.mjs';
 import userRoutes from './routes/users.mjs';
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/ping', pingRoutes);
 app.use('/users', userRoutes);
 app.use('/locations', locationRoutes);
 app.use('/orders', orderRoutes);
+app.use('/subscribers', subscriberRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
