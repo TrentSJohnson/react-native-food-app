@@ -27,6 +27,7 @@ export default function FriendsScreen() {
 
   const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
+  const [friends, setFriends] = useState<User[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
 
   const [myId, setMyId] = useState<string | null>(null);
@@ -37,12 +38,14 @@ export default function FriendsScreen() {
   const loadRequests = useCallback(async () => {
     setLoadingRequests(true);
     try {
-      const [received, sent] = await Promise.all([
+      const [received, sent, friendsRes] = await Promise.all([
         api.getReceivedRequests(),
         api.getSentRequests(),
+        api.getFriends(),
       ]);
       setReceivedRequests(received.requests);
       setSentRequests(sent.requests);
+      setFriends(friendsRes.friends);
     } catch {
       // silent
     } finally {
@@ -205,6 +208,17 @@ export default function FriendsScreen() {
     );
   };
 
+  const renderFriend = ({ item }: { item: User }) => (
+    <View style={[styles.row, { borderColor: colors.secondary }]}>
+      <View style={styles.userInfo}>
+        <Text style={[styles.username, { color: colors.text }]}>
+          {item.username ? `@${item.username}` : item.email}
+        </Text>
+        <Text style={[styles.subLabel, { color: colors.icon }]}>friend</Text>
+      </View>
+    </View>
+  );
+
   const showSearch = query.length >= 2;
 
   return (
@@ -255,28 +269,42 @@ export default function FriendsScreen() {
           {loadingRequests
             ? <ActivityIndicator color={burntPeach} style={{ marginTop: 32 }} />
             : (
-              <SectionList
-                contentContainerStyle={styles.listContent}
-                sections={[
-                  { title: 'Received Requests', data: receivedRequests, renderItem: renderReceivedRequest },
-                  { title: 'Outgoing Requests', data: sentRequests, renderItem: renderSentRequest },
-                ]}
-                keyExtractor={(item) => item._id}
-                renderSectionHeader={({ section: { title, data } }) =>
-                  data.length > 0 ? (
-                    <Text style={[styles.sectionTitle, { color: colors.text, backgroundColor: colors.background }]}>
-                      {title}
+              <>
+                <SectionList
+                  contentContainerStyle={styles.listContent}
+                  sections={[
+                    { title: 'Received Requests', data: receivedRequests, renderItem: renderReceivedRequest },
+                    { title: 'Outgoing Requests', data: sentRequests, renderItem: renderSentRequest },
+                  ]}
+                  keyExtractor={(item) => item._id}
+                  renderSectionHeader={({ section: { title, data } }) =>
+                    data.length > 0 ? (
+                      <Text style={[styles.sectionTitle, { color: colors.text, backgroundColor: colors.background }]}>
+                        {title}
+                      </Text>
+                    ) : null
+                  }
+                  ListEmptyComponent={
+                    <View style={styles.emptyState}>
+                      <Text style={[styles.emptyText, { color: colors.icon }]}>
+                        No pending friend requests.{'\n'}Search for users to add them as friends.
+                      </Text>
+                    </View>
+                  }
+                />
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Friends</Text>
+                <FlatList
+                  data={friends}
+                  keyExtractor={(item) => item._id}
+                  renderItem={renderFriend}
+                  contentContainerStyle={styles.listContent}
+                  ListEmptyComponent={
+                    <Text style={[styles.emptyText, { color: colors.icon, marginHorizontal: 16 }]}>
+                      No friends yet.
                     </Text>
-                  ) : null
-                }
-                ListEmptyComponent={
-                  <View style={styles.emptyState}>
-                    <Text style={[styles.emptyText, { color: colors.icon }]}>
-                      No pending friend requests.{'\n'}Search for users to add them as friends.
-                    </Text>
-                  </View>
-                }
-              />
+                  }
+                />
+              </>
             )
           }
         </>

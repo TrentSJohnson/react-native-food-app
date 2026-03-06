@@ -58,5 +58,7 @@ export function useApi() {
       api.patch<{ request: FriendRequest }>(`/subscribers/requests/${requestId}/accept`).then((r) => r.data),
     deleteFriendRequest: (requestId: string) =>
       api.delete<{ success: boolean }>(`/subscribers/requests/${requestId}`).then((r) => r.data),
+    getFriends: () =>
+      api.get<{ friends: User[] }>('/subscribers/friends').then((r) => r.data),
   };
 }

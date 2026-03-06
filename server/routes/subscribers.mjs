@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   acceptRequest,
   deleteRequest,
+  getFriends,
   getReceivedRequests,
   getSentRequests,
   sendFriendRequest,
@@ -11,6 +12,7 @@ import { requireAuth } from '../middleware/requireAuth.mjs';
 const router = Router();
 
 router.post('/request/:targetUserId', requireAuth, sendFriendRequest);
+router.get('/friends', requireAuth, getFriends);
 router.get('/requests/received', requireAuth, getReceivedRequests);
 router.get('/requests/sent', requireAuth, getSentRequests);
 router.patch('/requests/:requestId/accept', requireAuth, acceptRequest);

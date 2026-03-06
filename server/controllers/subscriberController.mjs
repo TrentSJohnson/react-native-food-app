@@ -75,6 +75,29 @@ export async function acceptRequest(req, res) {
   res.json({ request });
 }
 
+// GET /subscribers/friends
+// Get all accepted friends for current user
+export async function getFriends(req, res) {
+  const clerkId = req.query.clerkId;
+  const me = await User.findOne({ clerkId });
+  if (!me) return res.status(404).json({ error: 'User not found' });
+
+  const records = await Subscriber.find({
+    $or: [{ publisherId: me._id }, { subscriberId: me._id }],
+    status: 'accepted',
+  })
+    .populate('publisherId', 'username email')
+    .populate('subscriberId', 'username email');
+
+  const friends = records.map((r) => {
+    const pub = r.publisherId;
+    const sub = r.subscriberId;
+    return pub._id.equals(me._id) ? sub : pub;
+  });
+
+  res.json({ friends });
+}
+
 // DELETE /subscribers/requests/:requestId
 // Reject a received request OR cancel a sent request
 export async function deleteRequest(req, res) {
