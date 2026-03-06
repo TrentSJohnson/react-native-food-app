@@ -72,7 +72,7 @@ This is a standalone, greenfield product. It is the first entry into a planned s
 - **Statement:** The system shall provide a form to input "Dish Name," "Rating (1-5 stars)," and "Notes" linked to a specific restaurant ID.
 - **Rationale:** This is the primary value of the application.
 - **Acceptance Criteria:** Data must persist in the MongoDB database and be retrievable on the Summary page.
-- **Verification Method:** Test.
+- **Verification Method:** Demonstration.
 
 - **ID:** REQ-FUNC-003
 - **Title:** Social Connection (Friend Request)
@@ -121,9 +121,9 @@ This is a standalone, greenfield product. It is the first entry into a planned s
 
 | Requirement ID | Verification Method | Test/Artifact Link | Status | Evidence |
 |----------------|---------------------|--------------------|--------|----------|
-| REQ-FUNC-001   | Demonstration       | Search Flow Test   | Pending| N/A      |
-| REQ-FUNC-002   | Test                | CRUD Unit Tests    | Pending| N/A      |
-| REQ-FUNC-004   | Demonstration       | Friends Feed Test  | Pending| N/A      |
+| REQ-FUNC-001   | Demonstration       | Search Flow Test   | Verified | N/A      |
+| REQ-FUNC-002   | Demonstration       | Dish Logging Demo  | Verified | N/A      |
+| REQ-FUNC-004   | Demonstration       | Friends Feed Test  | Verified | N/A      |
 | REQ-SEC-001    | Analysis            | Security Audit Doc | Pending| N/A      |
 | REQ-SEC-002    | Analysis            | SOC 2 Audit Doc    | Pending| N/A      |
 
