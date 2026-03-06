@@ -1,24 +1,9 @@
 import { useAuth } from '@clerk/expo';
-import { useEffect } from 'react';
-import { api } from '../services/api';
+import { api, setAuthState } from '../services/api';
 
 export function useAuthInterceptor() {
   const { getToken, userId } = useAuth();
-
-  useEffect(() => {
-    const id = api.interceptors.request.use(async (config) => {
-      const token = await getToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      if (userId) {
-        config.params = { ...config.params, clerkId: userId };
-      }
-      return config;
-    });
-
-    return () => api.interceptors.request.eject(id);
-  }, [getToken, userId]);
+  setAuthState(getToken, userId ?? null);
 }
 
 type PlaceData = {
