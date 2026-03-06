@@ -21,7 +21,7 @@ export async function createOrder(req, res) {
 export async function getOrders(req, res) {
   console.log('[getOrders] GET /orders');
   const user = await User.findOne({ clerkId: req.query.clerkId });
-  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (!user) return res.json({ orders: [] });
   const orders = await Order.find({ userId: user._id }).populate('locationId').sort({ createdAt: -1 });
   res.json({ orders });
 }
