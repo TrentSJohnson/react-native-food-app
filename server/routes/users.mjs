@@ -8,7 +8,6 @@ router.get('/', requireAuth, getUsers);
 router.post('/upsert', requireAuth, upsertUser);
 router.get('/me', requireAuth, getMe);
 router.get('/check-username/:username', checkUsername);
-router.patch('/username', requireAuth, updateUsername);
 router.get('/search', requireAuth, searchUsers);
 
 export default router;

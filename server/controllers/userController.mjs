@@ -56,26 +56,3 @@ export async function searchUsers(req, res) {
     { username: { $regex: q.toLowerCase(), $options: 'i' } }).limit(20);
   res.json({ users });
 }
-
-export async function updateUsername(req, res) {
-  console.log('[updateUsername] PATCH /users/username');
-  const { userId: clerkId } = getAuth(req);
-  const { username } = req.body;
-  if (!username || username.length < 3) {
-    return res.status(400).json({ error: 'Username must be at least 3 characters' });
-  }
-
-  const taken = await User.findOne({ username: username.toLowerCase(), clerkId: { $ne: clerkId } });
-  if (taken) {
-    return res.status(409).json({ error: 'Username is already taken' });
-  }
-
-  const user = await User.findOneAndUpdate(
-    { clerkId },
-    { $set: { username: username.toLowerCase() } },
-    { returnDocument: 'after' }
-  );
-
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json({ user });
-}
