@@ -20,6 +20,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'magnifyingglass': 'search',
   'person.circle': 'account-circle',
+  'person.2.fill': 'group',
 } as IconMapping;
 
 /**

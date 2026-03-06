@@ -100,6 +100,9 @@ export default function HomeScreen() {
   const [editDescription, setEditDescription] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const [deleteOrder, setDeleteOrder] = useState<Order | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const fetchOrders = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     setError(null);
@@ -145,25 +148,21 @@ export default function HomeScreen() {
   };
 
   const handleDelete = (order: Order) => {
-    Alert.alert(
-      'Delete Order',
-      `Remove your order from ${order.locationId.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.deleteOrder(order._id);
-              setOrders((prev) => prev.filter((o) => o._id !== order._id));
-            } catch (e: unknown) {
-              Alert.alert('Error', e instanceof Error ? e.message : 'Failed to delete order');
-            }
-          },
-        },
-      ]
-    );
+    setDeleteOrder(order);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteOrder) return;
+    setDeleting(true);
+    try {
+      await api.deleteOrder(deleteOrder._id);
+      setOrders((prev) => prev.filter((o) => o._id !== deleteOrder._id));
+      setDeleteOrder(null);
+    } catch (e: unknown) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Failed to delete order');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const filtered = query.trim()
@@ -211,6 +210,41 @@ export default function HomeScreen() {
                   <ActivityIndicator size="small" color={cream} />
                 ) : (
                   <Text style={{ color: cream, fontWeight: '600' }}>Save</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={deleteOrder !== null}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setDeleteOrder(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: colors.background }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]} numberOfLines={1}>
+              {deleteOrder?.locationId.name}
+            </Text>
+            <Text style={[styles.modalLabel, { color: colors.icon }]}>
+              Remove your order from this restaurant?
+            </Text>
+            <View style={[ss.row, { gap: 12, marginTop: 12 }]}>
+              <TouchableOpacity
+                style={[styles.modalBtn, { borderColor: navajoWhite, borderWidth: 1 }]}
+                onPress={() => setDeleteOrder(null)}>
+                <Text style={{ color: colors.text }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBtn, { backgroundColor: burntPeach, opacity: deleting ? 0.6 : 1 }]}
+                onPress={handleConfirmDelete}
+                disabled={deleting}>
+                {deleting ? (
+                  <ActivityIndicator size="small" color={cream} />
+                ) : (
+                  <Text style={{ color: cream, fontWeight: '600' }}>Delete</Text>
                 )}
               </TouchableOpacity>
             </View>
