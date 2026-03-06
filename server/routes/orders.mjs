@@ -1,9 +1,10 @@
 import express from 'express';
-import { createOrder, deleteOrder, getOrders, updateOrder } from '../controllers/orderController.mjs';
+import { createOrder, deleteOrder, getFriendOrders, getOrders, updateOrder } from '../controllers/orderController.mjs';
 import { requireAuth } from '../middleware/requireAuth.mjs';
 
 const router = express.Router();
 
+router.get('/friend/:userId', requireAuth, getFriendOrders);
 router.get('/', requireAuth, getOrders);
 router.post('/', requireAuth, createOrder);
 router.patch('/:id', requireAuth, updateOrder);

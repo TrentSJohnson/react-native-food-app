@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Modal,
   SectionList,
   StyleSheet,
   Text,
@@ -14,7 +15,53 @@ import {
 import { sharedStyles as ss } from '@/constants/sharedStyles';
 import { Colors, burntPeach, cream, lightBlue, navajoWhite } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { FriendRequest, useApi, User } from '@/hooks/useApi';
+import { FriendRequest, Order, OrderLocation, useApi, User } from '@/hooks/useApi';
+
+const PRICE_LABELS: Record<string, string> = {
+  PRICE_LEVEL_FREE: 'Free',
+  PRICE_LEVEL_INEXPENSIVE: '$',
+  PRICE_LEVEL_MODERATE: '$$',
+  PRICE_LEVEL_EXPENSIVE: '$$$',
+  PRICE_LEVEL_VERY_EXPENSIVE: '$$$$',
+};
+
+function StarRating({ rating, color }: { rating: number; color: string }) {
+  const full = Math.floor(rating);
+  const hasHalf = rating - full >= 0.5;
+  const empty = 5 - full - (hasHalf ? 1 : 0);
+  return (
+    <Text style={{ fontSize: 13, color }}>
+      {'★'.repeat(full)}
+      {hasHalf ? '½' : ''}
+      {'☆'.repeat(empty)}
+      {` ${rating.toFixed(1)}`}
+    </Text>
+  );
+}
+
+function FriendOrderCard({ order, colors }: { order: Order; colors: (typeof Colors)['light'] }) {
+  const loc = order.locationId as OrderLocation;
+  const price = loc.priceLevel ? PRICE_LABELS[loc.priceLevel] : null;
+  return (
+    <View style={[friendStyles.card, { backgroundColor: colors.background, borderColor: colors.secondary }]}>
+      <Text style={[friendStyles.locationName, { color: colors.text }]} numberOfLines={1}>
+        {loc.name}
+      </Text>
+      {loc.address ? (
+        <Text style={[friendStyles.locationAddress, { color: colors.icon }]} numberOfLines={1}>
+          {loc.address}
+        </Text>
+      ) : null}
+      <View style={[ss.row, { gap: 8, marginBottom: 8 }]}>
+        {loc.rating !== undefined && <StarRating rating={loc.rating} color={colors.text} />}
+        {price ? <Text style={[friendStyles.chip, { color: colors.text }]}>{price}</Text> : null}
+      </View>
+      <View style={[friendStyles.orderDescContainer, { backgroundColor: colors.secondary + '55', borderColor: colors.secondary }]}>
+        <Text style={[friendStyles.orderDesc, { color: colors.text }]}>{order.description}</Text>
+      </View>
+    </View>
+  );
+}
 
 export default function FriendsScreen() {
   const colorScheme = useColorScheme();
@@ -32,6 +79,10 @@ export default function FriendsScreen() {
 
   const [myId, setMyId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
+  const [friendOrders, setFriendOrders] = useState<Order[]>([]);
+  const [loadingFriendOrders, setLoadingFriendOrders] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -115,6 +166,20 @@ export default function FriendsScreen() {
       Alert.alert('Error', 'Failed to remove request');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleFriendPress = async (friend: User) => {
+    setSelectedFriend(friend);
+    setFriendOrders([]);
+    setLoadingFriendOrders(true);
+    try {
+      const { orders } = await api.getFriendOrders(friend._id);
+      setFriendOrders(orders);
+    } catch {
+      Alert.alert('Error', 'Could not load orders');
+    } finally {
+      setLoadingFriendOrders(false);
     }
   };
 
@@ -209,20 +274,53 @@ export default function FriendsScreen() {
   };
 
   const renderFriend = ({ item }: { item: User }) => (
-    <View style={[styles.row, { borderColor: colors.secondary }]}>
+    <TouchableOpacity style={[styles.row, { borderColor: colors.secondary }]} onPress={() => handleFriendPress(item)}>
       <View style={styles.userInfo}>
         <Text style={[styles.username, { color: colors.text }]}>
           {item.username ? `@${item.username}` : item.email}
         </Text>
-        <Text style={[styles.subLabel, { color: colors.icon }]}>friend</Text>
+        <Text style={[styles.subLabel, { color: colors.icon }]}>friend · tap to see favorites</Text>
       </View>
-    </View>
+      <Text style={{ color: colors.icon, fontSize: 18 }}>›</Text>
+    </TouchableOpacity>
   );
 
   const showSearch = query.length >= 2;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Friend Orders Modal */}
+      <Modal
+        visible={selectedFriend !== null}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setSelectedFriend(null)}>
+        <View style={friendStyles.overlay}>
+          <View style={[friendStyles.sheet, { backgroundColor: colors.background }]}>
+            <View style={[ss.row, { marginBottom: 16 }]}>
+              <Text style={[friendStyles.sheetTitle, { color: colors.text, flex: 1 }]} numberOfLines={1}>
+                {selectedFriend?.username ? `@${selectedFriend.username}` : selectedFriend?.email}
+              </Text>
+              <TouchableOpacity onPress={() => setSelectedFriend(null)} hitSlop={8}>
+                <Text style={{ fontSize: 20, color: colors.icon }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            {loadingFriendOrders ? (
+              <ActivityIndicator color={burntPeach} style={{ marginTop: 16 }} />
+            ) : (
+              <FlatList
+                data={friendOrders}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => <FriendOrderCard order={item} colors={colors} />}
+                ListEmptyComponent={
+                  <Text style={[friendStyles.emptyText, { color: colors.icon }]}>No saved orders yet.</Text>
+                }
+                contentContainerStyle={{ paddingBottom: 24 }}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
       {/* Search bar */}
       <View style={[ss.row, ss.fieldBorder, styles.searchRow, { borderColor: navajoWhite }]}>
         <Text style={styles.searchIcon}>🔍</Text>
@@ -312,6 +410,58 @@ export default function FriendsScreen() {
     </View>
   );
 }
+
+const friendStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    maxHeight: '80%',
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  card: {
+    marginHorizontal: 0,
+    marginBottom: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 14,
+  },
+  locationName: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  locationAddress: {
+    fontSize: 13,
+    marginBottom: 6,
+  },
+  chip: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  orderDescContainer: {
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 10,
+  },
+  orderDesc: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  emptyText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 32,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
