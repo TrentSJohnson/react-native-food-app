@@ -83,5 +83,7 @@ export function useApi() {
       api.patch<{ order: Order }>(`/orders/${id}`, { description }).then((r) => r.data),
     deleteOrder: (id: string) =>
       api.delete<{ success: boolean }>(`/orders/${id}`).then((r) => r.data),
+    getFriendOrders: (userId: string) =>
+      api.get<{ orders: Order[] }>(`/orders/friend/${userId}`).then((r) => r.data),
   };
 }
