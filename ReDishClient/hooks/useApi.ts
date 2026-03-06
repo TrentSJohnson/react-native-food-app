@@ -26,11 +26,19 @@ type PlaceData = {
   priceLevel?: string;
 };
 
-type User = {
+export type User = {
   _id: string;
   clerkId: string;
   email: string;
   username?: string;
+  createdAt: string;
+};
+
+export type FriendRequest = {
+  _id: string;
+  publisherId: User | string;
+  subscriberId: User | string;
+  status: 'pending' | 'accepted' | 'rejected';
   createdAt: string;
 };
 
@@ -54,5 +62,17 @@ export function useApi() {
         .then((r) => r.data);
       return api.post('/orders', { description, locationId: location._id }).then((r) => r.data);
     },
+    searchUsers: (q: string) =>
+      api.get<{ users: User[] }>(`/users/search?q=${encodeURIComponent(q)}`).then((r) => r.data),
+    sendFriendRequest: (targetUserId: string) =>
+      api.post<{ request: FriendRequest }>(`/subscribers/request/${targetUserId}`).then((r) => r.data),
+    getReceivedRequests: () =>
+      api.get<{ requests: FriendRequest[] }>('/subscribers/requests/received').then((r) => r.data),
+    getSentRequests: () =>
+      api.get<{ requests: FriendRequest[] }>('/subscribers/requests/sent').then((r) => r.data),
+    acceptFriendRequest: (requestId: string) =>
+      api.patch<{ request: FriendRequest }>(`/subscribers/requests/${requestId}/accept`).then((r) => r.data),
+    deleteFriendRequest: (requestId: string) =>
+      api.delete<{ success: boolean }>(`/subscribers/requests/${requestId}`).then((r) => r.data),
   };
 }
