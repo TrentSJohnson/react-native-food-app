@@ -1,6 +1,6 @@
 # ReDish
 
-A React Native mobile app to document and share your favorite restaurant orders with friends.
+A React Native mobile app to document and share your favorite restaurant orders with friends. See breakdown [here](https://youtu.be/aSkrtj5Egi8)
 
 ---
 
