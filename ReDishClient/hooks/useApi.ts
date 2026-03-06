@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { api } from '../services/api';
 
 export function useAuthInterceptor() {
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
 
   useEffect(() => {
     const id = api.interceptors.request.use(async (config) => {
@@ -11,11 +11,14 @@ export function useAuthInterceptor() {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      if (userId) {
+        config.params = { ...config.params, clerkId: userId };
+      }
       return config;
     });
 
     return () => api.interceptors.request.eject(id);
-  }, [getToken]);
+  }, [getToken, userId]);
 }
 
 type PlaceData = {

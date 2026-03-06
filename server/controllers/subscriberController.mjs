@@ -1,11 +1,10 @@
-import { getAuth } from '@clerk/express';
 import { Subscriber } from '../models/subscriber.mjs';
 import { User } from '../models/user.mjs';
 
 // POST /subscribers/request/:targetUserId
 // Send a friend request to another user (current user = subscriber, target = publisher)
 export async function sendFriendRequest(req, res) {
-  const { userId: clerkId } = getAuth(req);
+  const clerkId = req.query.clerkId;
   const { targetUserId } = req.params;
 
   const me = await User.findOne({ clerkId });
@@ -37,7 +36,7 @@ export async function sendFriendRequest(req, res) {
 // GET /subscribers/requests/received
 // Get pending friend requests received by current user
 export async function getReceivedRequests(req, res) {
-  const { userId: clerkId } = getAuth(req);
+  const clerkId = req.query.clerkId;
   const me = await User.findOne({ clerkId });
   if (!me) return res.status(404).json({ error: 'User not found' });
 
@@ -50,7 +49,7 @@ export async function getReceivedRequests(req, res) {
 // GET /subscribers/requests/sent
 // Get pending friend requests sent by current user
 export async function getSentRequests(req, res) {
-  const { userId: clerkId } = getAuth(req);
+  const clerkId = req.query.clerkId;
   const me = await User.findOne({ clerkId });
   if (!me) return res.status(404).json({ error: 'User not found' });
 
@@ -63,7 +62,7 @@ export async function getSentRequests(req, res) {
 // PATCH /subscribers/requests/:requestId/accept
 // Accept a received friend request
 export async function acceptRequest(req, res) {
-  const { userId: clerkId } = getAuth(req);
+  const clerkId = req.query.clerkId;
   const me = await User.findOne({ clerkId });
   if (!me) return res.status(404).json({ error: 'User not found' });
 
@@ -79,7 +78,7 @@ export async function acceptRequest(req, res) {
 // DELETE /subscribers/requests/:requestId
 // Reject a received request OR cancel a sent request
 export async function deleteRequest(req, res) {
-  const { userId: clerkId } = getAuth(req);
+  const clerkId = req.query.clerkId;
   const me = await User.findOne({ clerkId });
   if (!me) return res.status(404).json({ error: 'User not found' });
 
