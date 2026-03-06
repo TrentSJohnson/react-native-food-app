@@ -30,6 +30,23 @@ export type FriendRequest = {
   createdAt: string;
 };
 
+export type OrderLocation = {
+  _id: string;
+  googlePlaceId: string;
+  name: string;
+  address?: string;
+  rating?: number;
+  priceLevel?: string;
+};
+
+export type Order = {
+  _id: string;
+  description: string;
+  locationId: OrderLocation;
+  userId: string;
+  createdAt: string;
+};
+
 export function useApi() {
   return {
     ping: () => api.get<{ message: string }>('/ping').then((r) => r.data),
@@ -60,5 +77,11 @@ export function useApi() {
       api.delete<{ success: boolean }>(`/subscribers/requests/${requestId}`).then((r) => r.data),
     getFriends: () =>
       api.get<{ friends: User[] }>('/subscribers/friends').then((r) => r.data),
+    getOrders: () =>
+      api.get<{ orders: Order[] }>('/orders').then((r) => r.data),
+    updateOrder: (id: string, description: string) =>
+      api.patch<{ order: Order }>(`/orders/${id}`, { description }).then((r) => r.data),
+    deleteOrder: (id: string) =>
+      api.delete<{ success: boolean }>(`/orders/${id}`).then((r) => r.data),
   };
 }
