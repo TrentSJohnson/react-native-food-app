@@ -25,19 +25,29 @@ export async function updateOrder(req, res) {
   const userId = req.query.clerkId;
   const { description } = req.body;
   if (!description) return res.status(400).json({ error: 'description is required' });
-  const order = await Order.findOneAndUpdate(
-    { _id: req.params.id, userId },
-    { description },
-    { new: true }
-  ).populate('locationId');
-  if (!order) return res.status(404).json({ error: 'Order not found' });
-  res.json({ order });
+  try {
+    const order = await Order.findOneAndUpdate(
+      { _id: req.params.id, userId },
+      { description },
+      { returnDocument: 'after' }
+    ).populate('locationId');
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    res.json({ order });
+  } catch (err) {
+    console.error('[updateOrder] error:', err);
+    res.status(500).json({ error: 'Failed to update order' });
+  }
 }
 
 export async function deleteOrder(req, res) {
   console.log('[deleteOrder] DELETE /orders/:id');
   const userId = req.query.clerkId;
-  const order = await Order.findOneAndDelete({ _id: req.params.id, userId });
-  if (!order) return res.status(404).json({ error: 'Order not found' });
-  res.json({ success: true });
+  try {
+    const order = await Order.findOneAndDelete({ _id: req.params.id, userId });
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[deleteOrder] error:', err);
+    res.status(500).json({ error: 'Failed to delete order' });
+  }
 }
