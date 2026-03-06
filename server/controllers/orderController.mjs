@@ -19,3 +19,25 @@ export async function getOrders(req, res) {
   const orders = await Order.find({ userId }).populate('locationId').sort({ createdAt: -1 });
   res.json({ orders });
 }
+
+export async function updateOrder(req, res) {
+  console.log('[updateOrder] PATCH /orders/:id');
+  const userId = req.query.clerkId;
+  const { description } = req.body;
+  if (!description) return res.status(400).json({ error: 'description is required' });
+  const order = await Order.findOneAndUpdate(
+    { _id: req.params.id, userId },
+    { description },
+    { new: true }
+  ).populate('locationId');
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  res.json({ order });
+}
+
+export async function deleteOrder(req, res) {
+  console.log('[deleteOrder] DELETE /orders/:id');
+  const userId = req.query.clerkId;
+  const order = await Order.findOneAndDelete({ _id: req.params.id, userId });
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  res.json({ success: true });
+}
