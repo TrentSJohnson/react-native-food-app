@@ -15,6 +15,7 @@ import {
 
 import { sharedStyles as ss } from '@/constants/sharedStyles';
 import { Colors, burntPeach, cream, navajoWhite } from '@/constants/theme';
+import { useServerStatus } from '@/context/server-status';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Order, useApi } from '@/hooks/useApi';
 
@@ -89,6 +90,7 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const api = useApi();
+  const { isServerReady } = useServerStatus();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,8 +121,9 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      if (!isServerReady) return;
       fetchOrders();
-    }, [fetchOrders])
+    }, [fetchOrders, isServerReady])
   );
 
   const handleRefresh = () => {
