@@ -14,6 +14,7 @@ import {
 
 import { sharedStyles as ss } from '@/constants/sharedStyles';
 import { Colors, burntPeach, cream, lightBlue, navajoWhite } from '@/constants/theme';
+import { useServerStatus } from '@/context/server-status';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { FriendRequest, Order, OrderLocation, useApi, User } from '@/hooks/useApi';
 
@@ -67,6 +68,7 @@ export default function FriendsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const api = useApi();
+  const { isServerReady } = useServerStatus();
 
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -105,9 +107,10 @@ export default function FriendsScreen() {
   }, []);
 
   useEffect(() => {
+    if (!isServerReady) return;
     api.getMe().then(({ user }) => setMyId(user._id)).catch(() => {});
     loadRequests();
-  }, [loadRequests]);
+  }, [isServerReady, loadRequests]);
 
   const handleQueryChange = (text: string) => {
     setQuery(text);

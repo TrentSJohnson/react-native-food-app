@@ -1,13 +1,14 @@
 import { useAuth, useUser } from '@clerk/expo';
 import { Redirect, Tabs, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useServerStatus } from '@/context/server-status';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
+import { burntPeach, Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
@@ -16,6 +17,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
+  const { isServerReady } = useServerStatus();
 
   if (!isLoaded) return null;
   if (!isSignedIn) return <Redirect href="/(auth)/sign-in" />;
@@ -30,6 +32,15 @@ export default function TabLayout() {
 
   return (
     <>
+      <Modal visible={!isServerReady} transparent animationType="fade" onRequestClose={() => {}}>
+        <View style={styles.serverWaitingOverlay}>
+          <ThemedView style={styles.serverWaitingCard}>
+            <ActivityIndicator size="large" color={burntPeach} style={{ marginBottom: 16 }} />
+            <ThemedText type="title" style={styles.serverWaitingTitle}>Connecting to server</ThemedText>
+            <ThemedText style={styles.serverWaitingText}>May take up to 1 minute</ThemedText>
+          </ThemedView>
+        </View>
+      </Modal>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: colors.tint,
@@ -98,6 +109,27 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  serverWaitingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  serverWaitingCard: {
+    borderRadius: 20,
+    padding: 32,
+    alignItems: 'center',
+    width: 280,
+  },
+  serverWaitingTitle: {
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  serverWaitingText: {
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+  },
   backdrop: {
     flex: 1,
   },

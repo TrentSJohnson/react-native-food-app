@@ -2,6 +2,7 @@ import { ClerkLoaded, ClerkProvider, useAuth, useUser } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect, useRef } from 'react';
+import { ServerStatusProvider, useServerStatus } from '../context/server-status';
 import { useApi, useAuthInterceptor } from '../hooks/useApi';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
@@ -18,12 +19,7 @@ function RootLayoutNav() {
   const upsertedRef = useRef(false);
   useAuthInterceptor();
   const api = useApi();
-
-  useEffect(() => {
-    api.ping()
-      .then((data) => console.log('Server ping:', data))
-      .catch((err) => console.error('Server ping failed:', err));
-  }, []);
+  const { onServerReady } = useServerStatus();
 
   useEffect(() => {
     if (!isSignedIn || !user) {
@@ -35,7 +31,11 @@ function RootLayoutNav() {
 
     const email = user.primaryEmailAddress?.emailAddress ?? '';
     const username = user.username ?? undefined;
-    api.upsertUser(email, username).catch((err) => console.error('User upsert failed:', err));
+
+    const doUpsert = () =>
+      api.upsertUser(email, username).catch((err) => console.error('User upsert failed:', err));
+
+    onServerReady(doUpsert);
   }, [isSignedIn, user]);
 
   useEffect(() => {
@@ -58,7 +58,9 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <ClerkLoaded>
-        <RootLayoutNav />
+        <ServerStatusProvider>
+          <RootLayoutNav />
+        </ServerStatusProvider>
       </ClerkLoaded>
     </ClerkProvider>
   );
